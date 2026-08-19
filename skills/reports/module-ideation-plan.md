@@ -1,16 +1,16 @@
 ---
-title: 'Module Plan'
+title: 'BMad Buddy Module Plan'
 status: 'ideation'
-module_name: ''
-module_code: ''
-module_description: ''
+module_name: 'BMad Buddy'
+module_code: 'bbu'
+module_description: 'Produces and compares independent SPEC drafts to expose likely missing capabilities, constraints, and requirements for human review.'
 architecture: ''
 standalone: true
 expands_module: ''
 skills_planned: []
 config_variables: []
 created: '2026-08-18T21:17:25+08:00'
-updated: '2026-08-18T21:18:00+08:00'
+updated: '2026-08-19T09:00:00+08:00'
 ---
 
 # Module Plan
@@ -106,6 +106,8 @@ Not ready — complete in Phase 3+.
 - Core idea: generate multiple independent SPEC.md artifacts in isolated contexts, then compare them. Differences across independently reasoned outputs make likely omissions visible and easier to review.
 - Inspiration: multi-agent debate / consensus, particularly Du et al. (2023), “Improving Factuality and Reasoning in Language Models through Multiagent Debate.” Multiple agents approach the problem from different perspectives, scrutinize one another, and aggregate toward a more reliable result than a single execution.
 - Desired outcome: a rigorous, reviewable way to surface missing requirement categories in a SPEC—not merely another free-form critique.
+- Identity: module display name is “BMad Buddy”; module code is `bbu`. It will avoid the reserved `bmad-` skill prefix.
+- Execution model: “independent environments” means multiple independent runs in the same workspace, not separately provisioned agent environments. Independence must therefore be designed into context, prompts, and artifacts.
 
 ## Build Roadmap
 
