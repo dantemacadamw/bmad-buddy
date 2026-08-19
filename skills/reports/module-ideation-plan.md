@@ -11,7 +11,7 @@ skills_planned:
   - 'bbu-agent-spec-auditor'
 config_variables: []
 created: '2026-08-18T21:17:25+08:00'
-updated: '2026-08-19T09:30:00+08:00'
+updated: '2026-08-19T09:40:00+08:00'
 ---
 
 # Module Plan
@@ -65,61 +65,97 @@ Not applicable: the module has one agent. Its only service relationship is to `b
 
 ## Skills
 
-Not ready — complete in Phase 3+.
+### bbu-agent-spec-auditor
 
-### {skill-name}
+**Type:** agent
 
-**Type:** {agent | workflow}
+**Persona:** A meticulous, evidence-first SPEC integrity auditor. Calm, concise, and candid about uncertainty. It never mistakes repetition for truth, never treats wording differences as proof of a gap, and keeps the human decisively in control of contract changes.
 
-**Persona:** <!-- For agents: who is this? Communication style, expertise, personality -->
+**Core Outcome:** Give the user a recoverable, evidence-backed review of their main `bmad-spec` package against two independently generated packages; enable the user to resolve every meaningful difference and safely incorporate only their approved changes.
 
-**Core Outcome:** <!-- What does success look like? -->
-
-**The Non-Negotiable:** <!-- The one thing this skill must get right -->
+**The Non-Negotiable:** No content may enter the main package without explicit item-level human acceptance and one explicit final confirmation. The agent must update the main package only through `bmad-spec` and its canonical `.memlog.md`; it must never hand-edit derived SPEC or spec-authored companion files.
 
 **Capabilities:**
 
 | Capability | Outcome | Inputs | Outputs |
-| ---------- | ------- | ------ | ------- |
-|            |         |        |         |
+| --- | --- | --- | --- |
+| Start or resume a review | Validates the existing main package, resolves the persistent review workspace, and creates or safely resumes a ledger without losing prior decisions. | Main SPEC-package path; original requirements and referenced source material; optional review ID; optional per-run settings. | Initialized/resumed `review-ledger.yaml`; immutable input manifest; clear status and next action. |
+| Generate independent comparison packages | Produces exactly two fresh `bmad-spec` packages from the same frozen supplied requirements, with neither run reading the main package nor the other run. | Frozen input manifest; slug/run identifiers; `independent_run_count` (default 2, minimum 2). | `independent-run-1/` and `independent-run-2/`, each containing SPEC.md, discovered companions, and `.memlog.md`; invocation provenance and failures in the ledger. |
+| Handle independent-run failure and retry | Rejects failed, incomplete, or Spec-Law-invalid independent packages as comparison evidence; lets the user rerun only the affected run without resetting the successful one. | Run status, generated package contents, and `bmad-spec` validation evidence. | Ledger status of `comparable` or `not-comparable` with reason; retained successful run; replacement package and provenance for any retried run. |
+| Build a semantic claim inventory | Extracts and normalizes contract claims across each kernel, all discovered companions, and `.memlog.md`, preserving source paths and locations. | Main and independent SPEC packages. | Claim inventory and equivalence links persisted in the ledger. |
+| Classify differences with evidence | Identifies candidate omissions, conflicts/ambiguities, and structural-only differences without relying on text diff. Verifies every potential omission against original requirements. | Claim inventory; original requirements; package provenance. | Evidence-graded, reasoned ledger items and `review-report.md`; optional HTML report. Candidate omissions cite direct support or explain a reasonable inference; unsupported assumptions become discussion hypotheses/open questions only. |
+| Conduct item-by-item review | Guides the user through each actionable item and records an explicit disposition: accept, reject, or needs clarification. Allows the user to edit the proposed wording and scope. | Ledger items; user decisions and edits. | Updated ledger, report status, disposition reasons, and edited proposals. |
+| Resolve clarification obligations | Blocks finalization until every “needs clarification” item becomes a resolved merge, a main-package `open_question`, or a rejected/abandoned item with rationale. | All clarification-state ledger items; user clarifications. | Complete per-item resolution evidence and an updated merge-readiness verdict. |
+| Prepare final merge summary | Produces an exact, reviewable snapshot of only approved changes and approved open questions. | Fully dispositioned ledger. | `pending-merge.md`, ledger finalization checklist, and explicit final-confirmation prompt. This is a strong candidate for an HTML summary as well. |
+| Safely merge approved decisions | After final user confirmation, sends approved decisions and open questions through `bmad-spec`, appends them to the main canonical memlog, and re-derives the package. | Final-confirmed merge summary; main package; user confirmation. | Updated main `.memlog.md`, re-derived `SPEC.md` and spec-authored companions, merge provenance, and final ledger record. |
+| Verify the merged package | Confirms that the re-derived main package contains every accepted item and approved `open_question`, preserves existing CAP IDs, retains required companion references, and has no unintended contract changes. | Final-confirmed merge summary; before/after main-package inventories; re-derived package. | Per-check verification verdict in the ledger and final report; a blocking failure state if expected content is absent or integrity regresses. |
+| Preserve audit trail | Lets the user inspect why an item was raised, its evidence level, decision, resolution, and merge status after an interruption or completed review. | Review ID or workspace path. | Resumed conversation context plus durable Markdown/HTML reports and ledger history. |
 
-<!-- For outputs: note where HTML reports, dashboards, or structured artifacts would add value -->
+**Memory:** The agent keeps no cross-project personal memory. On activation it reads the configured output location, the selected review workspace’s `review-ledger.yaml`, frozen input manifest, generated package paths, and reports as needed. It writes every state transition and user decision to the ledger; reports are derived views. It does not write a daily personal log.
 
-**Memory:** <!-- What does this agent read on activation? Write to? Daily log tag? -->
+**Init Responsibility:** Verify `bmad-spec` and the selected main package; record immutable source inputs and paths; create the per-review workspace and ledger schema; validate the run count and report options. Never create independent runs or alter the main package until inputs and workspace provenance are recorded.
 
-**Init Responsibility:** <!-- What happens on first run? Shared memory creation? Domain onboarding? -->
+**Activation Modes:** Interactive only. It may resume a previously interrupted interactive review. It does not offer headless or CI mode in the first release.
 
-**Activation Modes:** <!-- Interactive, headless, or both? -->
+**Tool Dependencies:** `bmad-spec` for independent generation and for the sole supported main-package update/re-derivation path. Standard BMad filesystem and `memlog.py` infrastructure are used through that skill. Static HTML generation is internal and has no browser, web service, database, or MCP dependency.
 
-**Tool Dependencies:** <!-- External tools with technical specifics -->
+**Design Notes:**
 
-**Design Notes:** <!-- Non-obvious considerations, the "why" behind decisions -->
+- Freeze the original requirements and source references before the independent runs; neither run may receive the main package or the other run’s output.
+- Discover companions from each SPEC.md’s `companions:` frontmatter. Compare `.memlog.md` as a canonical decision and preservation record, but never regard it as a downstream contract companion.
+- Semantic equivalence must search the full main package—including its companions and memlog—before classifying an independent claim as missing.
+- A claim appearing in both independent packages is stronger review signal, not truth. Evidence against original requirements controls its classification.
+- Structural-only companion organization differences are audit-only by default and cannot enter the merge summary unless the user explicitly turns one into a substantive item.
+- User edits to a proposal must retain both original provenance and edited wording in the ledger.
+- Pending merge must be reproducible from final ledger state; the agent must detect and invalidate/rebuild it if any ledger item changes before confirmation.
+- An independent run is evidence only after it completes with its required package artifacts and passes `bmad-spec`’s recorded Spec Law validation. A failed or incomplete run is `not-comparable`, never a source of difference findings; retry only that run and preserve all other review state.
+- Treat post-merge verification as mandatory. Compare the before/after main-package inventory and validate accepted items, resulting `open_question`s, existing CAP IDs, companion frontmatter references, and unexpected deltas before declaring the review complete.
+
+**Relationships:** Runs after a user has created or updated a main package with `bmad-spec`. It invokes `bmad-spec` twice for isolated comparison generation and once after final confirmation for the approved merge. `bmad-spec` remains the parent module and main-contract writer.
 
 ---
 
 ## Configuration
 
-Not ready — complete in Phase 3+.
-
 | Variable | Prompt | Default | Result Template | User Setting |
-| -------- | ------ | ------- | --------------- | ------------ |
-|          |        |         |                 |              |
+| --- | --- | --- | --- | --- |
+| `review_output_path` | “Where should BMad Buddy store persistent SPEC-review workspaces?” | `_bmad-output/spec-reviews/` | `review_output_path = "{value}"` | Yes — collected and persisted during setup. |
+
+`independent_run_count` is not an installation setting. It defaults to `2`, may be overridden for an individual review, and is rejected if less than `2`.
+
+`generate_html_report` is not an installation setting. It defaults to `true` and may be disabled for an individual review.
+
+The first release supports interactive use only; it does not offer a headless or CI mode.
 
 ## External Dependencies
 
-Not ready — complete in Phase 3+.
+The module depends on the installed `bmad-spec` skill and the standard BMad runtime it already uses (including `uv` and its project scripts). No external CLI, MCP server, database, or hosted web service is required.
+
+Setup must verify that `bmad-spec` is available and explain that BMad Buddy cannot independently generate or safely merge SPEC packages without it.
 
 ## UI and Visualization
 
-Not ready — complete in Phase 3+.
+The primary interface is a conversational, item-by-item review with explicit user decisions. `review-report.md` is the default report for terminal, Git, and agent use.
+
+When enabled, `review-report.html` is a static enhancement—not a required app or source of state. It groups candidate omissions, conflicts/ambiguities, and structural-only differences; shows source evidence, provenance, and current disposition; and links every view back to ledger item IDs. The ledger remains authoritative.
 
 ## Setup Extensions
 
-Not ready — complete in Phase 3+.
+Beyond normal module configuration, setup should:
+
+1. Verify `bmad-spec` is installed and accessible.
+2. Collect and persist `review_output_path`.
+3. Create the configured review-output directory only when a review first runs (or explicitly when setup validation requires it).
 
 ## Integration
 
-Not ready — complete in Phase 3+.
+**Parent capability:** `bmad-spec`.
+
+**Before BMad Buddy:** the user runs `bmad-spec` to create or update the main SPEC package from their requirements. The main package’s `.memlog.md` is the decision-of-record.
+
+**During BMad Buddy:** the agent invokes `bmad-spec` twice from the frozen supplied requirements to create independent comparison packages. It compares the two packages with the main package and guides human review.
+
+**After BMad Buddy:** after one explicit final confirmation, it invokes `bmad-spec` to append the confirmed decisions and/or open questions to the main `.memlog.md`, then re-derives the main `SPEC.md` and spec-authored companions. It never hand-edits derived artifacts.
 
 ## Creative Use Cases
 
