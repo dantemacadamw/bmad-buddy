@@ -10,7 +10,7 @@ expands_module: ''
 skills_planned: []
 config_variables: []
 created: '2026-08-18T21:17:25+08:00'
-updated: '2026-08-19T09:10:00+08:00'
+updated: '2026-08-19T09:20:00+08:00'
 ---
 
 # Module Plan
@@ -118,6 +118,17 @@ Not ready — complete in Phase 3+.
 - Report class 2 — conflicts / ambiguities: main and independent packages cover a topic but differ in wording, scope, or constraint. The report requires the user to choose an option, clarify it, or explicitly record it as an open question.
 - Report class 3 — structural-only differences: companion contents are organized differently without evidence of missing contract content. These are audit-only and are not merged by default.
 - Human-review workflow: (1) user reviews every candidate; (2) for each, selects accept, reject, or needs clarification and may edit wording or scope; (3) BMad Buddy creates a pending merge summary; (4) user confirms that summary once; (5) BMad Buddy calls `bmad-spec` to append confirmed items to the main `.memlog.md` and re-derive SPEC.md and companions.
+- Priority risk 1: avoid false omissions when the main package already expresses the same content through different wording, a companion, or a memlog entry. Comparison must prioritize semantic coverage and evidence tracing over text diff.
+- Priority risk 2: two independent packages can share the same unsupported assumption. Repetition is a signal for review, not evidence that the claim is true or should enter the main contract.
+- Priority risk 3: nothing enters the main package without explicit human confirmation. The final confirmation is a hard write gate, not a formality.
+- Priority risk 4: a conflict marked “needs clarification” cannot silently disappear. It requires durable, visible tracking through finalization so the resulting contract does not conceal unresolved ambiguity.
+- Positioning: BMad Buddy is an extension module for `bmad-spec`. It may audit an existing SPEC package, while independent generation and approved merging depend on `bmad-spec`.
+- Evidence requirement: every candidate must be traceable to the original requirements and receives an evidence grade. **Directly supported** items cite a source passage. **Reasonable inferences** explain the inference chain while acknowledging the requirement did not state them explicitly. **Unsupported assumptions** may appear only as a discussion hypothesis or `open_question`; they must never be labeled an omission.
+- Clarification resolution gate: every item marked “needs clarification” must be classified before final confirmation as exactly one of: clarified and merged; recorded as an `open_question` in the main memlog; or rejected/abandoned with a reason. The workflow cannot final-confirm while any such item is unclassified.
+- Primary review experience: conversational, item-by-item review backed by a persistent review ledger. An HTML report is an enhancement, not the sole user interface.
+- `review-ledger.yaml`: the single source of truth for review state. It stores each item’s status, edited text, evidence, rationale, clarification state, and final-confirmation record.
+- `review-report.md`: the default readable report for Git, terminals, and agent conversations.
+- `review-report.html`: an optional high-readability review view that groups items and shows their evidence and current state.
 
 ## Build Roadmap
 
