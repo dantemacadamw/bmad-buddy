@@ -1,6 +1,6 @@
 ---
 title: 'BMad Buddy Module Plan'
-status: 'in-progress'
+status: 'complete'
 module_name: 'BMad Buddy'
 module_code: 'bbu'
 module_description: 'Produces and compares independent SPEC drafts to expose likely missing capabilities, constraints, and requirements for human review.'
@@ -9,16 +9,19 @@ standalone: false
 expands_module: 'bmad-spec'
 skills_planned:
   - 'bbu-agent-spec-auditor'
-config_variables: []
+config_variables:
+  - 'review_output_path'
 created: '2026-08-18T21:17:25+08:00'
-updated: '2026-08-19T09:40:00+08:00'
+updated: '2026-08-19T09:45:00+08:00'
 ---
 
 # Module Plan
 
 ## Vision
 
-<!-- What this module does, who it's for, and why it matters -->
+BMad Buddy helps users of `bmad-spec` discover contract content that a single SPEC generation may have omitted. It creates two fresh, context-isolated comparison packages from the same requirements, then uses semantic comparison and requirement evidence to surface candidate omissions, conflicts, and structural-only differences against the user’s main package.
+
+It is for people who need a SPEC to be trustworthy enough for downstream planning and implementation, but who do not want a second model run—or a textual diff—to silently rewrite their contract. The user reviews every actionable item conversationally, controls exactly what is accepted, and confirms one explicit merge. The result is a more complete, explainable SPEC package with an auditable record of uncertainty and decisions.
 
 ## Architecture
 
@@ -159,7 +162,10 @@ Beyond normal module configuration, setup should:
 
 ## Creative Use Cases
 
-Not ready — complete in Phase 3+.
+- **High-stakes clarification pass:** When a user’s request contains unsupported implications, BMad Buddy can turn them into evidence-labeled discussion hypotheses and durable `open_question`s instead of silently inventing requirements.
+- **SPEC-update regression audit:** After a major source or requirement update, use a new review to check whether a regenerated main package retained previously load-bearing constraints, non-goals, CAP IDs, and companion references.
+- **Cross-team contract review:** A team can commit the Markdown report and ledger alongside a SPEC package, enabling reviewers to trace exactly why candidate requirements were accepted, rejected, or deferred without needing the original interactive session.
+- **Reusable completeness baseline:** Over time, teams can use completed ledgers to identify recurring categories of requirements that are frequently absent from their source material, while preserving the rule that such patterns are prompts for review—not automatic requirements.
 
 ## Ideas Captured
 
@@ -196,7 +202,10 @@ Not ready — complete in Phase 3+.
 
 ## Build Roadmap
 
-Not ready — complete in Phase 3+.
+1. **Build `bbu-agent-spec-auditor` with Build an Agent (BA).** It is the only planned skill and contains the complete user journey, persistence model, and safety gates. Build the ledger schema and merge/verification invariants before adding report polish.
+2. **Exercise the agent against a controlled `bmad-spec` fixture.** Cover: semantic equivalence across a companion or memlog; an unsupported assumption; a failed independent run with single-run retry; an unresolved clarification; and a post-merge integrity regression. Confirm no scenario permits unapproved content into the main package.
+3. **Create the BMad Buddy module with Create Module (CM).** Package the built agent, generate its setup skill, collect `review_output_path`, and verify `bmad-spec` availability.
+4. **Validate the module with Validate Module (VM).** Check capability registration, setup completeness, and package structure before distribution.
 
 **Next steps:**
 
