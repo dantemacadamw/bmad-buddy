@@ -10,7 +10,7 @@ expands_module: ''
 skills_planned: []
 config_variables: []
 created: '2026-08-18T21:17:25+08:00'
-updated: '2026-08-19T09:00:00+08:00'
+updated: '2026-08-19T09:10:00+08:00'
 ---
 
 # Module Plan
@@ -108,9 +108,16 @@ Not ready — complete in Phase 3+.
 - Desired outcome: a rigorous, reviewable way to surface missing requirement categories in a SPEC—not merely another free-form critique.
 - Identity: module display name is “BMad Buddy”; module code is `bbu`. It will avoid the reserved `bmad-` skill prefix.
 - Execution model: “independent environments” means multiple independent runs in the same workspace, not separately provisioned agent environments. Independence must therefore be designed into context, prompts, and artifacts.
-- Primary journey: the user starts with a main SPEC, then BMad Buddy independently reconstructs candidate SPECs from the underlying intent and validates the main SPEC for gaps. It is a reconstruction-and-gap-check process, not an editorial polish pass over the main SPEC.
-- Standalone requirement: BMad Buddy must provide value without `bmad-spec`. A `bmad-spec`-generated SPEC is a valuable input source, not a required dependency.
-- Candidate mechanisms to explore: each reconstruction sees only normalized source intent and an output contract, never peer drafts; intentionally varied reviewer perspectives; a semantic comparison that surfaces items appearing in only some drafts, grouped by requirement category and confidence; human-reviewed merge into the main SPEC with provenance and decision history.
+- Primary journey: the user first creates a main SPEC package with `bmad-spec`. BMad Buddy then calls `bmad-spec` multiple times with the user-provided requirements to independently generate comparison SPEC packages.
+- Comparison scope: every independent package is compared with the main package, including `SPEC.md`, all discovered companions, and `.memlog.md`.
+- Review output: BMad Buddy should identify candidate omissions—especially missing Capabilities and Constraints—rather than treating textual difference alone as an error.
+- Resolution: a human confirms the candidate omissions. Confirmed content is then merged into the final main SPEC package.
+- `bmad-spec` contract insight: `.memlog.md` is the canonical append-only record; SPEC.md and spec-authored companions are derived artifacts. Therefore BMad Buddy must not hand-edit the main SPEC or its spec-authored companions. It should add only human-approved findings to the main package’s memlog through the supported `bmad-spec` update path, then re-derive the package. Companions must be discovered from `SPEC.md` frontmatter, while the memlog is compared for preservation and decision-record coverage.
+- Run count: create two independent comparison SPEC packages by default. Together with the existing main package, the review covers three SPEC packages.
+- Report class 1 — candidate omissions: a claim exists in one or both independent packages but is absent from the main package. Each item shows its category (capability, constraint, non-goal, success signal, companion content, or memlog decision), which independent runs contain it, a source-text summary, and the reasoning for judging it missing from the main package.
+- Report class 2 — conflicts / ambiguities: main and independent packages cover a topic but differ in wording, scope, or constraint. The report requires the user to choose an option, clarify it, or explicitly record it as an open question.
+- Report class 3 — structural-only differences: companion contents are organized differently without evidence of missing contract content. These are audit-only and are not merged by default.
+- Human-review workflow: (1) user reviews every candidate; (2) for each, selects accept, reject, or needs clarification and may edit wording or scope; (3) BMad Buddy creates a pending merge summary; (4) user confirms that summary once; (5) BMad Buddy calls `bmad-spec` to append confirmed items to the main `.memlog.md` and re-derive SPEC.md and companions.
 
 ## Build Roadmap
 
