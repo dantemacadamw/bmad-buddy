@@ -108,6 +108,9 @@ Not ready — complete in Phase 3+.
 - Desired outcome: a rigorous, reviewable way to surface missing requirement categories in a SPEC—not merely another free-form critique.
 - Identity: module display name is “BMad Buddy”; module code is `bbu`. It will avoid the reserved `bmad-` skill prefix.
 - Execution model: “independent environments” means multiple independent runs in the same workspace, not separately provisioned agent environments. Independence must therefore be designed into context, prompts, and artifacts.
+- Primary journey: the user starts with a main SPEC, then BMad Buddy independently reconstructs candidate SPECs from the underlying intent and validates the main SPEC for gaps. It is a reconstruction-and-gap-check process, not an editorial polish pass over the main SPEC.
+- Standalone requirement: BMad Buddy must provide value without `bmad-spec`. A `bmad-spec`-generated SPEC is a valuable input source, not a required dependency.
+- Candidate mechanisms to explore: each reconstruction sees only normalized source intent and an output contract, never peer drafts; intentionally varied reviewer perspectives; a semantic comparison that surfaces items appearing in only some drafts, grouped by requirement category and confidence; human-reviewed merge into the main SPEC with provenance and decision history.
 
 ## Build Roadmap
 
