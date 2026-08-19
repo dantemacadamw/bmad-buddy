@@ -4,13 +4,14 @@ status: 'in-progress'
 module_name: 'BMad Buddy'
 module_code: 'bbu'
 module_description: 'Produces and compares independent SPEC drafts to expose likely missing capabilities, constraints, and requirements for human review.'
-architecture: ''
-standalone: true
-expands_module: ''
-skills_planned: []
+architecture: 'single conversational audit agent with persistent per-review artifacts'
+standalone: false
+expands_module: 'bmad-spec'
+skills_planned:
+  - 'bbu-agent-spec-auditor'
 config_variables: []
 created: '2026-08-18T21:17:25+08:00'
-updated: '2026-08-19T09:25:00+08:00'
+updated: '2026-08-19T09:30:00+08:00'
 ---
 
 # Module Plan
@@ -21,19 +22,46 @@ updated: '2026-08-19T09:25:00+08:00'
 
 ## Architecture
 
-Architecture selection in progress. The user has completed the raw-idea phase and authorized the transition to structured design.
+**Decision:** one conversational agent, `bbu-agent-spec-auditor`, extending `bmad-spec`.
+
+The agent owns one end-to-end review: it launches two independent `bmad-spec` runs from the same supplied requirements, compares those two resulting SPEC packages against the user’s existing main package, guides item-by-item human review, and performs the final approved merge through `bmad-spec`.
+
+**Rationale:** the review is inherently stateful and conversational. A single agent keeps the meaning of candidate items, prior user decisions, and the final confirmation gate together. The persistent ledger makes this state recoverable after interruption. Splitting generation, comparison, and merge into separate workflows would force users to manually bridge state; an orchestrator with multiple agents would add coordination cost without increasing the required execution independence.
+
+This is an expansion module: it depends on `bmad-spec` to generate independent packages and to be the sole supported writer of the main package. It remains useful whenever a user has an existing `bmad-spec` package to audit.
 
 ### Memory Architecture
 
-Not ready — complete in Phase 3+.
+**Pattern:** no long-lived personal agent memory. The review’s project artifacts are its durable, auditable state.
+
+For every review, the agent creates an isolated review workspace outside the main SPEC package, recommended as:
+
+```text
+{project-root}/_bmad-output/spec-reviews/{spec-slug}/{review-id}/
+  inputs/                     # immutable source requirements and references used for the independent runs
+  independent-run-1/          # a complete bmad-spec package
+  independent-run-2/          # a complete bmad-spec package
+  review-ledger.yaml          # canonical review state
+  review-report.md            # readable audit report
+  review-report.html          # optional enhanced view
+  pending-merge.md            # immutable snapshot presented for final confirmation
+```
+
+The existing main SPEC package is read as a third comparison package. It is not copied into the review workspace or modified before final confirmation.
 
 ### Memory Contract
 
-Not ready — complete in Phase 3+.
+| Artifact | Purpose | Read by | Written by | Key structure |
+| --- | --- | --- | --- | --- |
+| `review-ledger.yaml` | Canonical review state; never infer acceptance from prose reports. | Auditor on resume; user through conversational review. | Auditor after each explicit user decision. | Review metadata; immutable input/package references; candidate IDs; evidence grade and citations; comparison class; edited proposal; disposition and reason; clarification resolution; final-confirmation record. |
+| `review-report.md` | Default, Git-friendly human-readable report. | User, Git, terminal, and downstream agents. | Auditor, derived from ledger. | Candidate omissions, conflicts/ambiguities, structural-only audit, decisions, and merge readiness. |
+| `review-report.html` | Optional accessible visual rendition of the report. | User. | Auditor, derived from ledger. | Filterable groups, evidence, provenance, and current review status; never the source of truth. |
+| `pending-merge.md` | Exact human-review snapshot of accepted and resolved changes. | User at final confirmation. | Auditor after all items are dispositioned. | Changes to append, resulting open questions, rejected items, and references to ledger IDs. |
+| `independent-run-{1,2}/` | Complete independently generated evidence packages. | Auditor. | `bmad-spec` invocation. | `SPEC.md`, all discovered companions, and `.memlog.md`; immutable after generation for this review. |
 
 ### Cross-Agent Patterns
 
-Not ready — complete in Phase 3+.
+Not applicable: the module has one agent. Its only service relationship is to `bmad-spec`: BMad Buddy invokes it for independent generation and for the approved update of the main package. The user remains the decision-maker for all review dispositions and the final merge.
 
 ## Skills
 
