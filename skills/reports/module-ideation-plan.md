@@ -1,6 +1,6 @@
 ---
 title: 'BMad Buddy Module Plan'
-status: 'ideation'
+status: 'in-progress'
 module_name: 'BMad Buddy'
 module_code: 'bbu'
 module_description: 'Produces and compares independent SPEC drafts to expose likely missing capabilities, constraints, and requirements for human review.'
@@ -10,7 +10,7 @@ expands_module: ''
 skills_planned: []
 config_variables: []
 created: '2026-08-18T21:17:25+08:00'
-updated: '2026-08-19T09:20:00+08:00'
+updated: '2026-08-19T09:25:00+08:00'
 ---
 
 # Module Plan
@@ -21,7 +21,7 @@ updated: '2026-08-19T09:20:00+08:00'
 
 ## Architecture
 
-Not ready — complete in Phase 3+.
+Architecture selection in progress. The user has completed the raw-idea phase and authorized the transition to structured design.
 
 ### Memory Architecture
 
