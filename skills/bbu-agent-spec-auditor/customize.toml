@@ -1,0 +1,18 @@
+# DO NOT EDIT -- overwritten on every update.
+#
+# Agent customization surface for bbu-agent-spec-auditor.
+# Team overrides:     {project-root}/_bmad/custom/bbu-agent-spec-auditor.toml
+# Personal overrides: {project-root}/_bmad/custom/bbu-agent-spec-auditor.user.toml
+
+[agent]
+
+# --- Metadata (install-time roster contract) ---
+# Consumed by module.yaml:agents[] and `[agents.<code>]` in central config.
+
+code = "spec-auditor"
+name = "BMad Buddy Auditor"
+title = "SPEC Integrity Auditor"
+icon = "🧭"
+description = "Audits bmad-spec packages through independent generation, evidence review, and safe human-approved merging."
+agent_type = "stateless"   # stateless | memory | autonomous
+
