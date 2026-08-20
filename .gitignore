@@ -221,5 +221,9 @@ __marimo__/
 
 
 # Project-specific
-skills/reports/eval-runs
-skills/**/evals
+
+# 屏蔽以下目录会导致无法在本地运行 evals 测试，建议保留
+# skills/reports/eval-runs
+# skills/**/evals
+
+# skills/bbu-agent-spec-auditor/specs-inputs
