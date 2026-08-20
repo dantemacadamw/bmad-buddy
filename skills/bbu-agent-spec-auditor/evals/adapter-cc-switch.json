@@ -1,0 +1,26 @@
+{
+  "name": "claude-code-cc-switch",
+  "invocation": [
+    "claude",
+    "-p",
+    "{prompt}",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--dangerously-skip-permissions"
+  ],
+  "auth_env": "ANTHROPIC_AUTH_TOKEN",
+  "transcript": { "format": "stdout-jsonl" },
+  "skill_dir": ".claude/skills",
+  "load_signal": { "skill_tool": "Skill", "read_tool": "Read" },
+  "env_passthrough": [
+    "ANTHROPIC_BASE_URL",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL_NAME",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL_NAME",
+    "CLAUDE_CODE_ATTRIBUTION_HEADER"
+  ]
+}
